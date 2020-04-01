@@ -7,6 +7,9 @@ public class Hacker : MonoBehaviour
 {
     // Member Variable
     int level;
+    enum Screen { MainMenu, Password, Win };
+    Screen currentScreen;
+    string password;
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +19,7 @@ public class Hacker : MonoBehaviour
 
     void ShowMainMenu()
     {
+        currentScreen = Screen.MainMenu;
         Terminal.ClearScreen();
         Terminal.WriteLine("What Would You Like To Hack Into??");
         Terminal.WriteLine("Press \"1\" For The Local Library");
@@ -26,31 +30,60 @@ public class Hacker : MonoBehaviour
 
     void OnUserInput(string input)
     {
+        if (input == "menu")
+        {
+            ShowMainMenu();
+        }
+        else if (currentScreen == Screen.MainMenu)
+        {
+            RunMainMenu(input);
+        }
+        else if (currentScreen == Screen.Password) {
+            CheckPassword(input);
+        }
+    }
+
+    void RunMainMenu(string input)
+    {
         switch (input)
         {
             case "1":
                 level = 1;
-                StartGame(level);
+                password = "Text";
+                StartGame();
                 break;
             case "2":
                 level = 2;
-                StartGame(level);
+                password = "Planet";
+                StartGame();
                 break;
             case "3":
                 Terminal.WriteLine("You Have Chosen Level 3");
                 break;
-            case "main":
-                ShowMainMenu();
+            case "menu":
                 break;
             default:
                 Terminal.WriteLine("Please Chose A Invalid Level");
-
                 break;
         }
     }
 
-    private void StartGame(int Level)
+     void StartGame()
     {
-        Terminal.WriteLine("You Have Chosen " + Level);
+        currentScreen = Screen.Password;
+        Terminal.WriteLine("You Have Chosen");
+        Terminal.WriteLine("Please Enter Your Password");
+    }
+
+    void CheckPassword(string input)
+    {
+        if (input == password)
+        {
+            Terminal.WriteLine("You Win");
+        }
+        else
+        {
+            Terminal.WriteLine("Guess Again");
+        }
     }
 }
