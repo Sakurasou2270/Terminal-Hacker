@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
     // Member Variable
+    // Game Configurations
+    const string menuHint = "You Can Type \"menu\" To Go Back";
+    string[] level1Passwords = { "books", "aisle", "shelf", "password", "font", "borrow" };
+    string[] level2Passwords = { "prisoner", "handcuffs", "holster", "uniform", "arrest" };
+    string[] level3Passwords = { "starfield", "telescope", "environment", "exploration", "astronauts" };
+
+    // Game State
     int level;
     enum Screen { MainMenu, Password, Win };
     Screen currentScreen;
@@ -45,45 +49,108 @@ public class Hacker : MonoBehaviour
 
     void RunMainMenu(string input)
     {
-        switch (input)
+        bool isValidLevelNumber = (input == "1" || input == "2" || input == "3");
+        if (isValidLevelNumber)
         {
-            case "1":
-                level = 1;
-                password = "Text";
-                StartGame();
-                break;
-            case "2":
-                level = 2;
-                password = "Planet";
-                StartGame();
-                break;
-            case "3":
-                Terminal.WriteLine("You Have Chosen Level 3");
-                break;
-            case "menu":
-                break;
-            default:
-                Terminal.WriteLine("Please Chose A Invalid Level");
-                break;
+            level = int.Parse(input);
+            AskForPassword();
+        }
+        else
+        {
+            Terminal.WriteLine("Please Chose A Invalid Level");
+            Terminal.WriteLine(menuHint);
         }
     }
 
-     void StartGame()
+     void AskForPassword()
     {
         currentScreen = Screen.Password;
-        Terminal.WriteLine("You Have Chosen");
-        Terminal.WriteLine("Please Enter Your Password");
+        Terminal.ClearScreen();
+        SetRandomPassword();
+        Terminal.WriteLine("Enter Your Password. Hint: " + password.Anagram());
+        Terminal.WriteLine(menuHint);
+    }
+
+    void SetRandomPassword()
+    {
+        switch (level)
+        {
+            case 1:
+                password = level1Passwords[Random.Range(0, level1Passwords.Length)];
+                break;
+            case 2:
+                password = level2Passwords[Random.Range(0, level2Passwords.Length)];
+                break;
+            case 3:
+                password = level3Passwords[Random.Range(0, level3Passwords.Length)];
+                break;
+            default:
+                Debug.LogError("Error");
+                break;
+        }
     }
 
     void CheckPassword(string input)
     {
         if (input == password)
         {
-            Terminal.WriteLine("You Win");
+            DisplayWinScreen();
         }
         else
         {
-            Terminal.WriteLine("Guess Again");
+            AskForPassword();
+        }
+    }
+
+    void DisplayWinScreen()
+    {
+        currentScreen = Screen.Win;
+        Terminal.ClearScreen();
+        ShowLevelReward();
+    }
+
+    void ShowLevelReward()
+    {
+        switch (level)
+        {
+            case 1:
+                Terminal.WriteLine("You Have Crazy Knowledge!");
+                Terminal.WriteLine(@"
+      ______ ______
+    _/      Y      \_
+   // ~~ ~~ | ~~ ~  \\
+  // ~ ~ ~~ | ~~~ ~~ \\
+ //________.|.________\\
+`----------`-'----------'
+                ");
+                Terminal.WriteLine(menuHint);
+                break;
+            case 2:
+                Terminal.WriteLine("You Have Broken In!");
+                Terminal.WriteLine(@"
+  _ __   ___ | (_) ___ ___ 
+ | '_ \ / _ \| | |/ __/ _ \
+ | |_) | (_) | | | (_|  __/
+ | .__/ \___/|_|_|\___\___|
+ |_|                       
+
+                ");
+                Terminal.WriteLine(menuHint);
+                break;
+            case 3:
+                Terminal.WriteLine("Your A Rocket Scientist!");
+                Terminal.WriteLine(@"
+   __
+   \ \_____
+###[==_____>
+   /_/
+
+                ");
+                Terminal.WriteLine(menuHint);
+                break;
+            default:
+                Debug.LogError("Error Level Not Included");
+                break;
         }
     }
 }
